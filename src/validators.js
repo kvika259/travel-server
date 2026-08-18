@@ -51,8 +51,8 @@ export const createTripValidation = [
   body('description').optional().trim(),
   body('cityId').optional().isMongoId().withMessage('Неверный ID города'),
   body('countryId').optional().isMongoId().withMessage('Неверный ID страны'),
-  body('dateFrom').optional().isISO8601().toDate().withMessage('Неверная дата начала'),
-  body('dateTo').optional().isISO8601().toDate().withMessage('Неверная дата окончания'),
+  body('dateFrom').optional().isISO8601().withMessage('Неверная дата начала'),
+  body('dateTo').optional().isISO8601().withMessage('Неверная дата окончания'),
 ];
 
 export const tripIdValidation = [
