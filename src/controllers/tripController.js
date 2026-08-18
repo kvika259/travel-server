@@ -2,6 +2,8 @@ import Trip from '../models/Trip.js';
 import Photo from '../models/Photo.js';
 import Country from '../models/Country.js';
 import City from '../models/City.js';
+import VisitedCity from '../models/VisitedCity.js';
+import VisitedCountry from '../models/VisitedCountry.js';
 
 export async function getTrips(req, res, next) {
   try {
@@ -69,6 +71,31 @@ export async function createTrip(req, res, next) {
       dateTo: dateTo || '',
       photos: [],
     });
+
+    // Авто-отметка города и страны как посещённых при создании воспоминания
+    if (cityId) {
+      const existingVisitedCity = await VisitedCity.findOne({ userId: req.userId, cityId });
+      if (!existingVisitedCity) {
+        await VisitedCity.create({ userId: req.userId, cityId });
+      }
+
+      // Получаем countryId из города, если не указан явно
+      const city = await City.findById(cityId);
+      const resolvedCountryId = countryId || city?.countryId?.toString();
+
+      if (resolvedCountryId) {
+        const existingVisitedCountry = await VisitedCountry.findOne({ userId: req.userId, countryId: resolvedCountryId });
+        if (!existingVisitedCountry) {
+          await VisitedCountry.create({ userId: req.userId, countryId: resolvedCountryId });
+        }
+      }
+    } else if (countryId) {
+      // Если указан только countryId (без cityId), отмечаем страну
+      const existingVisitedCountry = await VisitedCountry.findOne({ userId: req.userId, countryId });
+      if (!existingVisitedCountry) {
+        await VisitedCountry.create({ userId: req.userId, countryId });
+      }
+    }
 
     res.status(201).json(trip);
   } catch (err) {
