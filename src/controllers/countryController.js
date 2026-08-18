@@ -120,7 +120,7 @@ export async function getCountryById(req, res, next) {
 
 export async function addCountry(req, res, next) {
   try {
-    const { name, emoji, coords } = req.body;
+    const { name, emoji } = req.body;
     if (!name) return res.status(400).json({ error: 'Название обязательно' });
 
     const normalizedName = titleCase(name);
@@ -130,7 +130,7 @@ export async function addCountry(req, res, next) {
     });
     if (existing) return res.status(409).json({ error: 'Страна уже существует' });
 
-    const country = await Country.create({ name: normalizedName, emoji: emoji || '🌍', coords: coords || { lat: 0, lng: 0 }, custom: true });
+    const country = await Country.create({ name: normalizedName, emoji: emoji || '🌍', custom: true });
     res.status(201).json(country);
   } catch (err) {
     next(err);

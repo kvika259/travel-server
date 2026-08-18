@@ -16,9 +16,6 @@ export const loginValidation = [
 export const addCountryValidation = [
   body('name').trim().notEmpty().withMessage('Название страны обязательно'),
   body('emoji').optional().isString(),
-  body('coords').optional().isObject().withMessage('Координаты должны быть объектом'),
-  body('coords.lat').if(body('coords').exists()).isFloat().withMessage('Неверная широта'),
-  body('coords.lng').if(body('coords').exists()).isFloat().withMessage('Неверная долгота'),
 ];
 
 export const countryIdValidation = [
