@@ -1,3 +1,4 @@
+import Country from '../models/Country.js';
 import City from '../models/City.js';
 import Attraction from '../models/Attraction.js';
 import VisitedCity from '../models/VisitedCity.js';
@@ -79,7 +80,22 @@ export async function addCity(req, res, next) {
     });
     if (existing) return res.status(409).json({ error: 'Город уже существует' });
 
-    const city = await City.create({ countryId, name: normalizedName, coords: coords || { lat: 0, lng: 0 }, custom: true });
+    // Получаем страну, чтобы использовать её координаты как дефолтные
+    const country = await Country.findById(countryId);
+    if (!country) return res.status(404).json({ error: 'Страна не найдена' });
+
+    // Если координаты не указаны или равны 0/0, используем координаты страны
+    let finalCoords = coords || {};
+    if (!finalCoords.lat || !finalCoords.lng) {
+      finalCoords = { lat: country.coords?.lat || 0, lng: country.coords?.lng || 0 };
+    }
+
+    const city = await City.create({ 
+      countryId, 
+      name: normalizedName, 
+      coords: finalCoords, 
+      custom: true 
+    });
     res.status(201).json(city);
   } catch (err) {
     next(err);
