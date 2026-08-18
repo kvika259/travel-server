@@ -2,6 +2,12 @@
 
 Бэкенд для приложения «Дневник путешествий» на Express + MongoDB с авторизацией.
 
+## Деплой
+
+- **Бэкенд**: https://travel-server-k5xo.onrender.com/
+- **Фронтенд**: https://pro-travel-diary.netlify.app/
+- **Swagger UI**: https://travel-server-k5xo.onrender.com/api-docs
+
 ## Валидация
 
 Все эндпоинты имеют валидацию входных данных:

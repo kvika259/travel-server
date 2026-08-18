@@ -13,8 +13,8 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:3000',
-        description: 'Локальный сервер',
+        url: 'https://travel-server-k5xo.onrender.com',
+        description: 'Продакшен-сервер (Render)',
       },
     ],
     components: {
