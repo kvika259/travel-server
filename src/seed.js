@@ -7,6 +7,7 @@ import City from './models/City.js';
 import Attraction from './models/Attraction.js';
 import countriesData from './data/countries.json' with { type: 'json' };
 import { seedCities, seedAttractions } from './data/seedData.js';
+import { fetchAttractions, mapToAttractionModel } from './utils/opentripmap.js';
 
 async function seed() {
   try {
@@ -91,6 +92,33 @@ async function seed() {
         await Attraction.create({ ...attrData, cityId });
         console.log(`  + Достопримечательность: ${a.name}`);
       }
+    }
+
+    // ── Автоматическая загрузка достопримечательностей из OpenTripMap ──
+    if (process.env.OPENTRIPMAP_API_KEY) {
+      console.log('\n🤖 Автоматическая загрузка достопримечательностей из OpenTripMap...');
+      
+      const citiesWithoutAttractions = await City.find({
+        _id: { $nin: await Attraction.distinct('cityId') }
+      }).limit(10); // ограничим 10 городами за раз
+      
+      for (const city of citiesWithoutAttractions) {
+        console.log(`  📥 Загрузка для города: ${city.name}`);
+        const attractions = await fetchAttractions(city.coords.lat, city.coords.lng);
+        
+        for (const attrData of attractions) {
+          const existing = await Attraction.findOne({ predefId: `otm-${attrData.xid}` });
+          if (!existing) {
+            const attractionModel = mapToAttractionModel(attrData, city._id);
+            await Attraction.create(attractionModel);
+            console.log(`    + ${attrData.name}`);
+          }
+        }
+        // Небольшая пауза между запросами к API
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    } else {
+      console.log('\nℹ️ OPENTRIPMAP_API_KEY не задан — пропуск автоматической загрузки');
     }
 
     const totalCountries = await Country.countDocuments();
