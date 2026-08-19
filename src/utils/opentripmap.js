@@ -4,8 +4,10 @@ import axios from 'axios';
 // Документация: https://opentripmap.com/ru/doc/api
 // Регистрация для получения API ключа: https://opentripmap.com/ru/account/register
 
-// Для тестирования используем демо-ключ
-const OPENTRIPMAP_API_KEY = '5ae2e3f221c38a28845f05b6'; // демо-ключ (ограничен)
+import dotenv from 'dotenv';
+dotenv.config();
+
+const OPENTRIPMAP_API_KEY = process.env.OPENTRIPMAP_API_KEY;
 const BASE_URL = 'https://api.opentripmap.com/0.1/ru/places';
 
 /**
